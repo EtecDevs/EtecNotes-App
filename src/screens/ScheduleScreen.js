@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { useTheme } from "../context/ThemeContext"
@@ -89,10 +89,15 @@ export default function ScheduleScreen() {
     },
   ]
 
+  // Descobre o índice do dia da semana atual (Segunda=0, Terça=1, ...)
   const today = new Date()
   const weekDays = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"]
-  const currentDay = scheduleData[currentIndex]
-  const isToday = currentDay.day === weekDays[today.getDay()]
+  const todayIndex = Math.max(0, scheduleData.findIndex((d) => d.day === weekDays[today.getDay()]))
+  const [openAccordion, setOpenAccordion] = useState(todayIndex)
+
+  useEffect(() => {
+    setOpenAccordion(todayIndex)
+  }, [todayIndex])
 
   const styles = createStyles(theme)
 
@@ -101,120 +106,97 @@ export default function ScheduleScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Horários</Text>
       </View>
-
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Day Navigation */}
-        <View style={styles.navigation}>
-          <TouchableOpacity
-            onPress={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
-            disabled={currentIndex === 0}
-            style={[styles.navButton, currentIndex === 0 && styles.navButtonDisabled]}
-          >
-            <Ionicons
-              name="chevron-back"
-              size={24}
-              color={currentIndex === 0 ? theme.colors.textSecondary : theme.colors.primary}
-            />
-          </TouchableOpacity>
-
-          <View style={styles.dayInfo}>
-            <Text style={styles.dayName}>{currentDay.day}</Text>
-            {isToday && (
-              <View style={styles.todayBadge}>
-                <Text style={styles.todayText}>Hoje</Text>
-              </View>
-            )}
-          </View>
-
-          <TouchableOpacity
-            onPress={() => setCurrentIndex(Math.min(scheduleData.length - 1, currentIndex + 1))}
-            disabled={currentIndex === scheduleData.length - 1}
-            style={[styles.navButton, currentIndex === scheduleData.length - 1 && styles.navButtonDisabled]}
-          >
-            <Ionicons
-              name="chevron-forward"
-              size={24}
-              color={currentIndex === scheduleData.length - 1 ? theme.colors.textSecondary : theme.colors.primary}
-            />
-          </TouchableOpacity>
-        </View>
-
-        {/* Day Indicators */}
-        <View style={styles.dayIndicators}>
-          {scheduleData.map((_, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => setCurrentIndex(index)}
-              style={[styles.dayIndicator, index === currentIndex && styles.dayIndicatorActive]}
-            />
-          ))}
-        </View>
-
-        {/* Schedule Card */}
-        <View style={styles.scheduleCard}>
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {currentDay.periods.map((period, index) => (
-              <View
-                key={index}
-                style={[styles.periodCard, period.isBreak && styles.breakCard, period.isVacant && styles.vacantCard]}
+        {/* Acordeons dos dias da semana */}
+        <View style={styles.accordionContainer}>
+          {scheduleData.map((dayData, index) => (
+            <View key={index} style={styles.accordion}>
+              <TouchableOpacity
+                style={[
+                  styles.accordionHeader,
+                  openAccordion === index && styles.accordionHeaderActive,
+                ]}
+                onPress={() => setOpenAccordion(openAccordion === index ? null : index)}
               >
-                <View style={styles.periodTime}>
-                  <Text
-                    style={[
-                      styles.timeText,
-                      period.isBreak && styles.breakTimeText,
-                      period.isVacant && styles.vacantTimeText,
-                    ]}
-                  >
-                    {period.time}
-                  </Text>
+                <Text style={styles.dayName}>{dayData.day}</Text>
+                <Ionicons
+                  name={openAccordion === index ? "chevron-up" : "chevron-down"}
+                  size={20}
+                  color={theme.colors.primary}
+                />
+                {index === todayIndex && (
+                  <View style={styles.todayBadge}>
+                    <Text style={styles.todayText}>Hoje</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+              {openAccordion === index && (
+                <View style={styles.scheduleCard}>
+                  {dayData.periods.map((period, pIndex) => (
+                    <View
+                      key={pIndex}
+                      style={[
+                        styles.periodCard,
+                        period.isBreak && styles.breakCard,
+                        period.isVacant && styles.vacantCard,
+                      ]}
+                    >
+                      <View style={styles.periodTime}>
+                        <Text
+                          style={[
+                            styles.timeText,
+                            period.isBreak && styles.breakTimeText,
+                            period.isVacant && styles.vacantTimeText,
+                          ]}
+                        >
+                          {period.time}
+                        </Text>
+                      </View>
+                      <View style={styles.periodContent}>
+                        <Text
+                          style={[
+                            styles.subjectText,
+                            period.isBreak && styles.breakSubjectText,
+                            period.isVacant && styles.vacantSubjectText,
+                          ]}
+                        >
+                          {period.subject}
+                        </Text>
+                        {period.teacher && <Text style={styles.teacherText}>{period.teacher}</Text>}
+                      </View>
+                      <View style={styles.periodIcon}>
+                        <Ionicons
+                          name={period.isBreak ? "cafe" : period.isVacant ? "time" : "school"}
+                          size={20}
+                          color={period.isBreak ? theme.colors.primary : period.isVacant ? "#FFC107" : theme.colors.info}
+                        />
+                      </View>
+                    </View>
+                  ))}
+                  {/* Resumo do dia */}
+                  <View style={styles.summary}>
+                    <Text style={styles.summaryTitle}>Resumo do Dia</Text>
+                    <View style={styles.summaryStats}>
+                      <View style={styles.statItem}>
+                        <Text style={styles.statNumber}>
+                          {dayData.periods.filter((p) => !p.isBreak && !p.isVacant).length}
+                        </Text>
+                        <Text style={styles.statLabel}>Aulas</Text>
+                      </View>
+                      <View style={styles.statItem}>
+                        <Text style={styles.statNumber}>{dayData.periods.filter((p) => p.isBreak).length}</Text>
+                        <Text style={styles.statLabel}>Intervalos</Text>
+                      </View>
+                      <View style={styles.statItem}>
+                        <Text style={styles.statNumber}>{dayData.periods.filter((p) => p.isVacant).length}</Text>
+                        <Text style={styles.statLabel}>Vagas</Text>
+                      </View>
+                    </View>
+                  </View>
                 </View>
-
-                <View style={styles.periodContent}>
-                  <Text
-                    style={[
-                      styles.subjectText,
-                      period.isBreak && styles.breakSubjectText,
-                      period.isVacant && styles.vacantSubjectText,
-                    ]}
-                  >
-                    {period.subject}
-                  </Text>
-
-                  {period.teacher && <Text style={styles.teacherText}>{period.teacher}</Text>}
-                </View>
-
-                <View style={styles.periodIcon}>
-                  <Ionicons
-                    name={period.isBreak ? "cafe" : period.isVacant ? "time" : "school"}
-                    size={20}
-                    color={period.isBreak ? theme.colors.primary : period.isVacant ? "#FFC107" : theme.colors.info}
-                  />
-                </View>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* Summary */}
-        <View style={styles.summary}>
-          <Text style={styles.summaryTitle}>Resumo do Dia</Text>
-          <View style={styles.summaryStats}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>
-                {currentDay.periods.filter((p) => !p.isBreak && !p.isVacant).length}
-              </Text>
-              <Text style={styles.statLabel}>Aulas</Text>
+              )}
             </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{currentDay.periods.filter((p) => p.isBreak).length}</Text>
-              <Text style={styles.statLabel}>Intervalos</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{currentDay.periods.filter((p) => p.isVacant).length}</Text>
-              <Text style={styles.statLabel}>Vagas</Text>
-            </View>
-          </View>
+          ))}
         </View>
       </ScrollView>
     </View>
@@ -237,31 +219,32 @@ const createStyles = (theme) =>
       fontWeight: "bold",
       color: theme.colors.text,
     },
-    navigation: {
+    accordionContainer: {
+      flexDirection: "column",
+      gap: 12,
+      paddingHorizontal: 16,
+      paddingBottom: 24,
+    },
+    accordion: {
+      marginBottom: 8,
+    },
+    accordionHeader: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      paddingHorizontal: 24,
-      marginBottom: 16,
-    },
-    navButton: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
       backgroundColor: theme.colors.surface,
-      alignItems: "center",
-      justifyContent: "center",
+      borderRadius: 12,
+      paddingVertical: 16,
+      paddingHorizontal: 20,
+      marginBottom: 2,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
+      shadowOpacity: 0.08,
       shadowRadius: 4,
-      elevation: 2,
+      elevation: 1,
     },
-    navButtonDisabled: {
-      opacity: 0.5,
-    },
-    dayInfo: {
-      alignItems: "center",
+    accordionHeaderActive: {
+      backgroundColor: theme.colors.primary + "20",
     },
     dayName: {
       fontSize: 24,
@@ -280,29 +263,11 @@ const createStyles = (theme) =>
       fontSize: 12,
       fontWeight: "600",
     },
-    dayIndicators: {
-      flexDirection: "row",
-      justifyContent: "center",
-      gap: 8,
-      marginBottom: 24,
-    },
-    dayIndicator: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: theme.colors.border,
-    },
-    dayIndicatorActive: {
-      backgroundColor: theme.colors.primary,
-      width: 24,
-    },
     scheduleCard: {
-      marginHorizontal: 24,
       backgroundColor: theme.colors.surface,
       borderRadius: 16,
       padding: 16,
-      maxHeight: 500,
-      marginBottom: 24,
+      marginBottom: 8,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,

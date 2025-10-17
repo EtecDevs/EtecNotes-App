@@ -26,8 +26,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const userData = await AsyncStorage.getItem("user")
       if (userData) {
+        // Carrega os dados do usuário, mas NÃO marca como autenticado.
         setUser(JSON.parse(userData))
-        setIsAuthenticated(true)
+        // NÃO chamar setIsAuthenticated(true) aqui para evitar login automático.
       }
     } catch (error) {
       console.error("Error checking auth status:", error)

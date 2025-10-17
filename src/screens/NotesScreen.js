@@ -4,12 +4,14 @@ import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Dimensions } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { useTheme } from "../context/ThemeContext"
 
 const { width } = Dimensions.get("window")
 
 export default function NotesScreen() {
   const [notes, setNotes] = useState([])
   const [newNoteText, setNewNoteText] = useState("")
+  const { theme } = useTheme()
 
   useEffect(() => {
     loadNotes()
@@ -77,24 +79,34 @@ export default function NotesScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Notas</Text>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
+        <Text style={[styles.title, { color: theme.colors.primary }]}>Notas</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         {/* Add Note Input */}
         <View style={styles.addNoteContainer}>
           <TextInput
-            style={styles.noteInput}
+            style={[
+              styles.noteInput,
+              {
+                backgroundColor: theme.colors.surface,
+                color: theme.colors.text,
+                borderColor: theme.colors.border,
+              },
+            ]}
             placeholder="Digite uma nota..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={theme.colors.textSecondary}
             value={newNoteText}
             onChangeText={setNewNoteText}
             multiline
           />
           <TouchableOpacity
-            style={[styles.addButton, newNoteText.trim() ? styles.addButtonActive : null]}
+            style={[
+              styles.addButton,
+              newNoteText.trim() ? { backgroundColor: theme.colors.primary } : { backgroundColor: theme.colors.surfaceSecondary },
+            ]}
             onPress={addNote}
           >
             <Ionicons name={newNoteText.trim() ? "checkmark" : "add"} size={24} color="#FFFFFF" />
@@ -103,19 +115,22 @@ export default function NotesScreen() {
 
         {/* Notes List */}
         {notes.map((note) => (
-          <View key={note.id} style={styles.noteCard}>
+          <View key={note.id} style={[styles.noteCard, { backgroundColor: theme.colors.surface }]}>
             <View style={styles.noteContent}>
-              <View style={styles.noteBorder} />
-              <Text style={styles.noteText}>{note.text}</Text>
+              <View style={[styles.noteBorder, { backgroundColor: theme.colors.primary }]} />
+              <Text style={[styles.noteText, { color: theme.colors.text }]}>{note.text}</Text>
+              <TouchableOpacity style={styles.deleteButton} onPress={() => deleteNote(note.id)}>
+                <Ionicons name="trash-outline" size={20} color={theme.colors.error} />
+              </TouchableOpacity>
             </View>
           </View>
         ))}
 
         {notes.length === 0 && !newNoteText && (
           <View style={styles.emptyState}>
-            <Ionicons name="document-text-outline" size={64} color="#D1D5DB" />
-            <Text style={styles.emptyTitle}>Nenhuma nota ainda</Text>
-            <Text style={styles.emptySubtitle}>Comece digitando sua primeira nota acima</Text>
+            <Ionicons name="document-text-outline" size={64} color={theme.colors.surfaceSecondary} />
+            <Text style={[styles.emptyTitle, { color: theme.colors.textSecondary }]}>Nenhuma nota ainda</Text>
+            <Text style={[styles.emptySubtitle, { color: theme.colors.textSecondary }]}>Comece digitando sua primeira nota acima</Text>
           </View>
         )}
       </ScrollView>
@@ -126,18 +141,18 @@ export default function NotesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F3F4F6",
+    // backgroundColor: "#F3F4F6",
   },
   header: {
     paddingHorizontal: 24,
     paddingTop: 60,
     paddingBottom: 20,
-    backgroundColor: "#F3F4F6",
+    // backgroundColor: "#F3F4F6",
   },
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#8B5CF6",
+    // color: "#8B5CF6",
   },
   content: {
     paddingHorizontal: 24,
@@ -150,12 +165,10 @@ const styles = StyleSheet.create({
   },
   noteInput: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
     borderRadius: 16,
     paddingHorizontal: 20,
     paddingVertical: 16,
     fontSize: 16,
-    color: "#374151",
     minHeight: 56,
     maxHeight: 120,
     textAlignVertical: "top",
@@ -164,12 +177,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
   },
   addButton: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#D1D5DB",
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
@@ -178,11 +191,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  addButtonActive: {
-    backgroundColor: "#8B5CF6",
-  },
   noteCard: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 16,
     marginBottom: 16,
     shadowColor: "#000",
@@ -193,19 +202,22 @@ const styles = StyleSheet.create({
   },
   noteContent: {
     flexDirection: "row",
+    alignItems: "center",
     padding: 20,
   },
   noteBorder: {
     width: 4,
-    backgroundColor: "#8B5CF6",
     borderRadius: 2,
     marginRight: 16,
   },
   noteText: {
     flex: 1,
     fontSize: 16,
-    color: "#374151",
     lineHeight: 24,
+  },
+  deleteButton: {
+    marginLeft: 12,
+    padding: 4,
   },
   emptyState: {
     alignItems: "center",
@@ -214,13 +226,11 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#6B7280",
     marginTop: 16,
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 16,
-    color: "#9CA3AF",
     textAlign: "center",
   },
 })
