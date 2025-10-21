@@ -44,13 +44,13 @@ export default function ProfileScreen() {
             </View>
 
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Identificação:</Text>
+              <Text style={styles.detailLabel}>Cod. Etec:</Text>
               <Text style={styles.detailValue}>{user?.identification || "266"}</Text>
             </View>
 
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>RM:</Text>
-              <Text style={styles.detailValue}>{user?.rm || "XXXXX"}</Text>
+              <Text style={styles.detailValue}>{user?.rm || "04617"}</Text>
             </View>
 
             <View style={styles.detailRow}>

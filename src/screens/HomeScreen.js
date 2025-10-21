@@ -1,13 +1,19 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated } from "react-native"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated, Image } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { useTheme } from "../context/ThemeContext"
 
+// Importar imagens dos eventos
+const semanaTecnologica = require("../assets/events/semana-tecnologica.jpg")
+const hackathon = require("../assets/events/hackathon.png")
+const palestra = require("../assets/events/palestra-ti.jpg")
+const festaJunina = require("../assets/events/festa-junina.jpg")
+
 const { width } = Dimensions.get("window")
 const TABS = ["Jornal", "Horários", "Patch", "Eventos"] // Added "Horários"
-const INITIAL_TAB = 2 // Updated to keep Patch as initial tab
+const INITIAL_TAB = 0 // Jornal como tab inicial após login
 
 // Componente de Jornal com carrossel de slides
 const JournalTab = ({ theme, scrollEnabled }) => {
@@ -17,31 +23,35 @@ const JournalTab = ({ theme, scrollEnabled }) => {
     {
       id: 1,
       title: "Semana Tecnológica",
-      description: "A Semana Tecnológica da Etec é um evento anual que reúne palestras, workshops e exposições sobre as últimas tendências em tecnologia.",
-      icon: "bulb",
-      color: "#FF6B6B",
+      description: "A Semana Tecnológica da Etec é um evento anual que reúne palestras, workshops e exposições sobre as últimas tendências em tecnologia. Os alunos têm a oportunidade de conhecer profissionais da área, participar de competições e apresentar seus projetos inovadores para a comunidade.",
+      image: semanaTecnologica,
+      color: "#6B32C3",
+      icon: "school-outline"
     },
     {
       id: 2,
       title: "Hackathon Etec",
-      description: "Maratona de programação de 24 horas onde alunos desenvolvem soluções tecnológicas inovadoras em equipe.",
-      icon: "code-slash",
-      color: "#4ECDC4",
+      description: "O Hackathon da Etec é uma maratona de programação onde alunos formam equipes para desenvolver soluções tecnológicas inovadoras em 24 horas. É uma oportunidade única de colocar em prática os conhecimentos adquiridos e competir com colegas em um ambiente colaborativo e desafiador.",
+      image: hackathon,
+      color: "#5527A3",
+      icon: "code-slash-outline"
     },
     {
       id: 3,
       title: "Palestras em TI",
-      description: "Profissionais renomados da área de tecnologia compartilham conhecimentos sobre carreira e tendências do mercado.",
-      icon: "people",
-      color: "#45B7D1",
+      description: "Conheça as palestras e workshops ministrados por profissionais renomados da área de tecnologia. São oportunidades de aprendizado sobre carreira, novas tecnologias, metodologias ágeis e tendências do mercado de trabalho.",
+      image: palestra,
+      color: "#7B3FD7",
+      icon: "bulb-outline"
     },
     {
       id: 4,
       title: "Eventos Culturais",
-      description: "Festa junina, gincanas e apresentações artísticas que promovem a integração da comunidade escolar.",
-      icon: "musical-notes",
-      color: "#FFA07A",
-    },
+      description: "A Etec oferece diversos eventos culturais ao longo do ano, como festa junina, gincanas, apresentações artísticas e confraternizações. Esses eventos promovem a integração entre alunos, professores e a comunidade escolar.",
+      image: festaJunina,
+      color: "#9352EB",
+      icon: "balloon-outline"
+    }
   ]
 
   const currentSlideData = slides[currentSlide]
@@ -69,11 +79,14 @@ const JournalTab = ({ theme, scrollEnabled }) => {
         Jornal Etec
       </Text>
 
-      {/* Slider Card */}
+      {/* Slider Card com Imagem */}
       <View style={[styles.journalSliderCard, { backgroundColor: currentSlideData.color }]}>
-        <View style={styles.journalIconContainer}>
-          <Ionicons name={currentSlideData.icon} size={80} color="#FFFFFF" />
-        </View>
+        <Image 
+          source={currentSlideData.image} 
+          style={styles.journalImage}
+          resizeMode="cover"
+        />
+        <View style={styles.journalImageOverlay} />
 
         {/* Navigation Buttons */}
         <TouchableOpacity
@@ -1144,6 +1157,20 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 8,
     position: 'relative',
+    overflow: 'hidden',
+  },
+  journalImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    borderRadius: 24,
+  },
+  journalImageOverlay: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 24,
   },
   journalIconContainer: {
     justifyContent: 'center',

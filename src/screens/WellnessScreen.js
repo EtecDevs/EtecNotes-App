@@ -1,13 +1,25 @@
 "use client"
 
+import { useState } from "react"
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
+import { useNavigation } from "@react-navigation/native"
 import { useTheme } from "../context/ThemeContext"
 
 const { width } = Dimensions.get("window")
 
 export default function WellnessScreen() {
   const { theme } = useTheme()
+  const navigation = useNavigation()
+  const [activeTab, setActiveTab] = useState("meditation")
+
+  const handleTabChange = (tab) => {
+    if (tab === "meditation") {
+      setActiveTab(tab)
+    } else if (tab === "iatec") {
+      navigation.navigate("Chat")
+
+  }
 
   const wellnessOptions = [
     {
@@ -52,6 +64,49 @@ export default function WellnessScreen() {
             <Ionicons name="fitness" size={20} color={theme.colors.primary} />
           </TouchableOpacity>
         </View>
+      </View>
+
+      {/* Tab Navigation */}
+      <View style={[styles.tabsContainer, { backgroundColor: theme.colors.surface }]}>
+        <TouchableOpacity
+          onPress={() => handleTabChange("iatec")}
+          style={[
+            styles.tab,
+            activeTab === "iatec" && [styles.tabActive, { backgroundColor: "#58417d" }]
+          ]}
+        >
+          <Ionicons 
+            name="chatbubble-ellipses" 
+            size={16} 
+            color={activeTab === "iatec" ? "#FFFFFF" : theme.colors.textSecondary} 
+          />
+          <Text style={[
+            styles.tabText,
+            { color: activeTab === "iatec" ? "#FFFFFF" : theme.colors.textSecondary }
+          ]}>
+            IATEC AI
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => handleTabChange("meditation")}
+          style={[
+            styles.tab,
+            activeTab === "meditation" && [styles.tabActive, { backgroundColor: "#8C43FF" }]
+          ]}
+        >
+          <Ionicons 
+            name="heart" 
+            size={16} 
+            color={activeTab === "meditation" ? "#FFFFFF" : theme.colors.textSecondary} 
+          />
+          <Text style={[
+            styles.tabText,
+            { color: activeTab === "meditation" ? "#FFFFFF" : theme.colors.textSecondary }
+          ]}>
+            Meditação
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
@@ -252,5 +307,35 @@ const styles = StyleSheet.create({
   },
   featureDescription: {
     fontSize: 14,
+  },
+  tabsContainer: {
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    gap: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.1)",
+  },
+  tab: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 6,
+  },
+  tabActive: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: "500",
   },
 })
