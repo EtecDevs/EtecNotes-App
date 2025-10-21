@@ -297,6 +297,9 @@ export default function CalendarScreen() {
             </View>
           </View>
         </View>
+
+        {/* Espaçamento extra no final para garantir visibilidade */}
+        <View style={{ height: 120 }} />
       </ScrollView>
 
       <Modal

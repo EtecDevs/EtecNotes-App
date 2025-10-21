@@ -9,52 +9,432 @@ const { width } = Dimensions.get("window")
 const TABS = ["Jornal", "Horários", "Patch", "Eventos"] // Added "Horários"
 const INITIAL_TAB = 2 // Updated to keep Patch as initial tab
 
+// Componente de Jornal com carrossel de slides
+const JournalTab = ({ theme, scrollEnabled }) => {
+  const [currentSlide, setCurrentSlide] = useState(0)
+
+  const slides = [
+    {
+      id: 1,
+      title: "Semana Tecnológica",
+      description: "A Semana Tecnológica da Etec é um evento anual que reúne palestras, workshops e exposições sobre as últimas tendências em tecnologia.",
+      icon: "bulb",
+      color: "#FF6B6B",
+    },
+    {
+      id: 2,
+      title: "Hackathon Etec",
+      description: "Maratona de programação de 24 horas onde alunos desenvolvem soluções tecnológicas inovadoras em equipe.",
+      icon: "code-slash",
+      color: "#4ECDC4",
+    },
+    {
+      id: 3,
+      title: "Palestras em TI",
+      description: "Profissionais renomados da área de tecnologia compartilham conhecimentos sobre carreira e tendências do mercado.",
+      icon: "people",
+      color: "#45B7D1",
+    },
+    {
+      id: 4,
+      title: "Eventos Culturais",
+      description: "Festa junina, gincanas e apresentações artísticas que promovem a integração da comunidade escolar.",
+      icon: "musical-notes",
+      color: "#FFA07A",
+    },
+  ]
+
+  const currentSlideData = slides[currentSlide]
+
+  const goToPreviousSlide = () => {
+    setCurrentSlide((currentSlide - 1 + slides.length) % slides.length)
+  }
+
+  const goToNextSlide = () => {
+    setCurrentSlide((currentSlide + 1) % slides.length)
+  }
+
+  // Auto-play
+  useEffect(() => {
+    const interval = setInterval(() => {
+      goToNextSlide()
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [currentSlide])
+
+  return (
+    <ScrollView style={styles.tabContent} scrollEnabled={scrollEnabled}>
+      <Text style={[styles.contentTitle, { color: theme.colors.primary }]}>
+        Jornal Etec
+      </Text>
+
+      {/* Slider Card */}
+      <View style={[styles.journalSliderCard, { backgroundColor: currentSlideData.color }]}>
+        <View style={styles.journalIconContainer}>
+          <Ionicons name={currentSlideData.icon} size={80} color="#FFFFFF" />
+        </View>
+
+        {/* Navigation Buttons */}
+        <TouchableOpacity
+          onPress={goToPreviousSlide}
+          style={[styles.journalNavButton, styles.journalNavButtonLeft]}
+        >
+          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={goToNextSlide}
+          style={[styles.journalNavButton, styles.journalNavButtonRight]}
+        >
+          <Ionicons name="chevron-forward" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Slide Indicators */}
+      <View style={styles.journalIndicators}>
+        {slides.map((_, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => setCurrentSlide(index)}
+            style={[
+              styles.journalIndicator,
+              {
+                backgroundColor: index === currentSlide ? theme.colors.primary : theme.colors.textSecondary,
+                width: index === currentSlide ? 32 : 8,
+                opacity: index === currentSlide ? 1 : 0.3,
+              },
+            ]}
+          />
+        ))}
+      </View>
+
+      {/* Description */}
+      <View style={[styles.journalDescription, { backgroundColor: theme.colors.surface }]}>
+        <Text style={[styles.journalTitle, { color: theme.colors.text }]}>
+          {currentSlideData.title}
+        </Text>
+        <Text style={[styles.journalText, { color: theme.colors.textSecondary }]}>
+          {currentSlideData.description}
+        </Text>
+      </View>
+
+      {/* Info Section */}
+      <View style={[styles.journalInfoCard, { backgroundColor: theme.colors.surface }]}>
+        <Ionicons name="information-circle" size={32} color={theme.colors.primary} />
+        <Text style={[styles.journalInfoText, { color: theme.colors.text }]}>
+          O Jornal Etec mantém alunos, professores e a comunidade escolar atualizados sobre eventos, 
+          atividades e temas relevantes para o ambiente educacional.
+        </Text>
+      </View>
+
+      {/* Espaçamento extra no final para garantir visibilidade */}
+      <View style={{ height: 120 }} />
+    </ScrollView>
+  )
+}
+
+// Componente de Horários com navegação por setas
+const ScheduleTab = ({ theme, scrollEnabled }) => {
+  const [currentDayIndex, setCurrentDayIndex] = useState(0)
+
+  const scheduleData = [
+    {
+      day: "Segunda",
+      classes: [
+        { time: "08:00 - 08:50", subject: "Aula Vaga", isVacant: true },
+        { time: "08:50 - 09:40", subject: "Aula Vaga", isVacant: true },
+        { time: "09:40 - 10:00", subject: "Intervalo", isBreak: true },
+        { time: "10:00 - 10:50", subject: "Sistemas Embarcados", teacher: "Prof. Iury" },
+        { time: "10:50 - 11:40", subject: "Sistemas Embarcados", teacher: "Prof. Iury" },
+        { time: "11:40 - 12:30", subject: "Sociologia", teacher: "Profa. Elza" },
+        { time: "12:30 - 13:30", subject: "Almoço", isBreak: true },
+        { time: "13:30 - 14:20", subject: "EAMT", teacher: "Profa. Elza" },
+        { time: "14:20 - 15:10", subject: "EAMT", teacher: "Profa. Elza" },
+        { time: "15:10 - 16:00", subject: "EAMT", teacher: "Profa. Elza" },
+      ],
+    },
+    {
+      day: "Terça",
+      classes: [
+        { time: "08:00 - 08:50", subject: "P.W.", teacher: "Prof. Paulo" },
+        { time: "08:50 - 09:40", subject: "P.W.", teacher: "Prof. Paulo" },
+        { time: "09:40 - 10:00", subject: "Intervalo", isBreak: true },
+        { time: "10:00 - 10:50", subject: "E.A.C.N.T.", teacher: "Profa. Elza e Profa. Andreia" },
+        { time: "10:50 - 11:40", subject: "E.A.C.N.T.", teacher: "Profa. Elza e Profa. Andreia" },
+        { time: "11:40 - 12:30", subject: "Inglês", teacher: "Prof. Fidélis" },
+        { time: "12:30 - 13:30", subject: "Almoço", isBreak: true },
+        { time: "13:30 - 14:20", subject: "Inglês", teacher: "Prof. Fidélis" },
+        { time: "14:20 - 15:10", subject: "Matematica", teacher: "Prof. William B." },
+        { time: "15:10 - 16:00", subject: "Matematica", teacher: "Prof. William B." },
+      ],
+    },
+    {
+      day: "Quarta",
+      classes: [
+        { time: "08:00 - 08:50", subject: "P.A.M. I, II", teacher: "Prof. Paulo" },
+        { time: "08:50 - 09:40", subject: "P.A.M. I, II", teacher: "Prof. Paulo" },
+        { time: "09:40 - 10:00", subject: "Intervalo", isBreak: true },
+        { time: "10:00 - 10:50", subject: "IPSSI", teacher: "Prof. Iury e Profa. Vanessa" },
+        { time: "10:50 - 11:40", subject: "IPSSI", teacher: "Prof. Iury e Profa. Vanessa" },
+        { time: "11:40 - 12:30", subject: "Filosofia", teacher: "Profa. Elza" },
+        { time: "12:30 - 13:30", subject: "Almoço", isBreak: true },
+        { time: "13:30 - 14:20", subject: "Biologia", teacher: "Profa. Andreia" },
+        { time: "14:20 - 15:10", subject: "Biologia", teacher: "Profa. Andreia" },
+        { time: "15:10 - 16:00", subject: "E.A.C.N.T.", teacher: "Profa. Andreia e Profa. Elza" },
+      ],
+    },
+    {
+      day: "Quinta",
+      classes: [
+        { time: "08:00 - 08:50", subject: "Português", teacher: "Prof. Fidélis" },
+        { time: "08:50 - 09:40", subject: "Português", teacher: "Prof. Fidélis" },
+        { time: "09:40 - 10:00", subject: "Intervalo", isBreak: true },
+        { time: "10:00 - 10:50", subject: "P.D.T.C.C.", teacher: "Profa. Veridiane e Profa. Elisângela" },
+        { time: "10:50 - 11:40", subject: "P.D.T.C.C.", teacher: "Profa. Veridiane e Profa. Elisângela" },
+        { time: "11:40 - 12:30", subject: "P.D.T.C.C.", teacher: "Profa. Veridiane e Profa. Elisângela" },
+        { time: "12:30 - 13:30", subject: "Almoço", isBreak: true },
+        { time: "13:30 - 14:20", subject: "Português", teacher: "Prof. Fidélis" },
+        { time: "14:20 - 15:10", subject: "Matematica", teacher: "Prof. William B." },
+        { time: "15:10 - 16:00", subject: "Matematica", teacher: "Prof. William B." },
+      ],
+    },
+    {
+      day: "Sexta",
+      classes: [
+        { time: "08:00 - 08:50", subject: "Aula Vaga", isVacant: true },
+        { time: "08:50 - 09:40", subject: "Filosofia", teacher: "Profa. Elza" },
+        { time: "09:40 - 10:00", subject: "Intervalo", isBreak: true },
+        { time: "10:00 - 10:50", subject: "Q.T.S.", teacher: "Prof. Iury e Prof. Gisbert" },
+        { time: "10:50 - 11:40", subject: "Q.T.S.", teacher: "Prof. Iury e Prof. Gisbert" },
+        { time: "11:40 - 12:30", subject: "Aula Vaga", isVacant: true },
+        { time: "12:30 - 13:30", subject: "Almoço", isBreak: true },
+        { time: "13:30 - 14:20", subject: "Geografia", teacher: "Prof. Valdeci" },
+        { time: "14:20 - 15:10", subject: "Geografia", teacher: "Prof. Valdeci" },
+        { time: "15:10 - 16:00", subject: "Sociologia", teacher: "Profa. Elza" },
+      ],
+    },
+  ]
+
+  const currentSchedule = scheduleData[currentDayIndex]
+
+  const goToPreviousDay = () => {
+    if (currentDayIndex > 0) {
+      setCurrentDayIndex(currentDayIndex - 1)
+    }
+  }
+
+  const goToNextDay = () => {
+    if (currentDayIndex < scheduleData.length - 1) {
+      setCurrentDayIndex(currentDayIndex + 1)
+    }
+  }
+
+  return (
+    <View style={styles.tabContent}>
+      <Text style={[styles.contentTitle, { color: theme.colors.primary }]}>
+        Horários da Semana
+      </Text>
+
+      {/* Navigation Header */}
+      <View style={styles.scheduleNavigation}>
+        <TouchableOpacity
+          onPress={goToPreviousDay}
+          disabled={currentDayIndex === 0}
+          style={[
+            styles.navButton,
+            { backgroundColor: theme.colors.primary },
+            currentDayIndex === 0 && styles.navButtonDisabled,
+          ]}
+        >
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={currentDayIndex === 0 ? theme.colors.textSecondary : "#FFFFFF"}
+          />
+        </TouchableOpacity>
+
+        <View style={[styles.dayIndicator, { backgroundColor: theme.colors.surface }]}>
+          <Text style={[styles.dayIndicatorText, { color: theme.colors.primary }]}>
+            {currentSchedule.day}
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          onPress={goToNextDay}
+          disabled={currentDayIndex === scheduleData.length - 1}
+          style={[
+            styles.navButton,
+            { backgroundColor: theme.colors.primary },
+            currentDayIndex === scheduleData.length - 1 && styles.navButtonDisabled,
+          ]}
+        >
+          <Ionicons
+            name="chevron-forward"
+            size={24}
+            color={currentDayIndex === scheduleData.length - 1 ? theme.colors.textSecondary : "#FFFFFF"}
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* Day Indicators */}
+      <View style={styles.dayDots}>
+        {scheduleData.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.dot,
+              {
+                backgroundColor:
+                  index === currentDayIndex ? theme.colors.primary : theme.colors.textSecondary,
+                opacity: index === currentDayIndex ? 1 : 0.3,
+              },
+            ]}
+          />
+        ))}
+      </View>
+
+      {/* Schedule Content */}
+      <ScrollView 
+        style={styles.scheduleContent} 
+        showsVerticalScrollIndicator={false}
+        scrollEnabled={scrollEnabled}
+      >
+        <View style={[styles.dayCardSingle, { backgroundColor: theme.colors.surface }]}>
+          <View style={styles.classBlock}>
+            {currentSchedule.classes.map((classItem, index) => {
+              if (classItem.isBreak) {
+                return (
+                  <View
+                    key={index}
+                    style={[styles.breakItem, { backgroundColor: theme.colors.primary + "20" }]}
+                  >
+                    <Text style={[styles.breakText, { color: theme.colors.primary }]}>
+                      {classItem.subject} ({classItem.time})
+                    </Text>
+                  </View>
+                )
+              }
+
+              if (classItem.isVacant) {
+                return (
+                  <View
+                    key={index}
+                    style={[styles.vacantItem, { backgroundColor: theme.colors.primary }]}
+                  >
+                    <Text style={styles.vacantText}>{classItem.subject}</Text>
+                    <Text style={styles.vacantTime}>{classItem.time}</Text>
+                  </View>
+                )
+              }
+
+              return (
+                <ClassItem
+                  key={index}
+                  time={classItem.time}
+                  subject={classItem.subject}
+                  teacher={classItem.teacher}
+                  theme={theme}
+                />
+              )
+            })}
+          </View>
+        </View>
+
+        {/* Espaçamento extra no final para garantir visibilidade */}
+        <View style={{ height: 120 }} />
+      </ScrollView>
+    </View>
+  )
+}
+
 export default function HomeScreen() {
   const { theme } = useTheme()
   const [activeTab, setActiveTab] = useState(INITIAL_TAB)
+  const [scrollEnabled, setScrollEnabled] = useState(true) // Controla se o scroll vertical está habilitado
   const scrollX = useRef(new Animated.Value(-width * INITIAL_TAB)).current
   const scrollViewRef = useRef(null)
   const isDragging = useRef(false)
   const startX = useRef(0)
+  const startY = useRef(0)
+  const isHorizontalSwipe = useRef(null) // null = não determinado ainda
 
-  // Controlador de gestos otimizado
+  // Controlador de gestos otimizado com bloqueio de scroll vertical
   const handleTouchStart = (event) => {
     isDragging.current = true
+    isHorizontalSwipe.current = null // Reseta ao começar novo toque
     startX.current = event.nativeEvent.pageX
+    startY.current = event.nativeEvent.pageY
   }
 
   const handleTouchMove = (event) => {
     if (!isDragging.current) return
 
     const currentX = event.nativeEvent.pageX
-    const diff = currentX - startX.current
-    const newPosition = -width * activeTab + diff
+    const currentY = event.nativeEvent.pageY
+    const diffX = currentX - startX.current
+    const diffY = currentY - startY.current
 
-    // Limita o scroll nas extremidades
-    if (
-      (activeTab === 0 && diff > 0) || 
-      (activeTab === TABS.length - 1 && diff < 0)
-    ) {
-      return
+    // Determina a direção apenas uma vez
+    if (isHorizontalSwipe.current === null) {
+      const absX = Math.abs(diffX)
+      const absY = Math.abs(diffY)
+      
+      // Se moveu mais de 10px, determina a direção
+      if (absX > 10 || absY > 10) {
+        isHorizontalSwipe.current = absX > absY
+        
+        // Se for horizontal, BLOQUEIA o scroll vertical
+        if (isHorizontalSwipe.current) {
+          setScrollEnabled(false)
+        }
+      } else {
+        return
+      }
     }
 
-    scrollX.setValue(newPosition)
+    // Só aplica o movimento horizontal se for swipe horizontal
+    if (isHorizontalSwipe.current === true) {
+      const newPosition = -width * activeTab + diffX
+
+      // Limita o scroll nas extremidades
+      if (
+        (activeTab === 0 && diffX > 0) || 
+        (activeTab === TABS.length - 1 && diffX < 0)
+      ) {
+        return
+      }
+
+      scrollX.setValue(newPosition)
+    }
   }
 
   const handleTouchEnd = (event) => {
     if (!isDragging.current) return
+    
+    const wasHorizontalSwipe = isHorizontalSwipe.current === true
     isDragging.current = false
+    isHorizontalSwipe.current = null
+    
+    // REABILITA o scroll vertical ao soltar o dedo
+    setScrollEnabled(true)
 
-    const currentX = event.nativeEvent.pageX
-    const diff = currentX - startX.current
-    const moveThreshold = width * 0.2
+    // Só troca de tab se foi um swipe horizontal
+    if (wasHorizontalSwipe) {
+      const currentX = event.nativeEvent.pageX
+      const diff = currentX - startX.current
+      const moveThreshold = width * 0.2
 
-    let newIndex = activeTab
-    if (Math.abs(diff) > moveThreshold) {
-      newIndex = diff > 0 ? Math.max(0, activeTab - 1) : Math.min(TABS.length - 1, activeTab + 1)
+      let newIndex = activeTab
+      if (Math.abs(diff) > moveThreshold) {
+        newIndex = diff > 0 ? Math.max(0, activeTab - 1) : Math.min(TABS.length - 1, activeTab + 1)
+      }
+
+      switchTab(newIndex)
+    } else {
+      // Se não foi swipe horizontal, mantém a posição atual
+      switchTab(activeTab)
     }
-
-    switchTab(newIndex)
   }
 
   const switchTab = (index) => {
@@ -70,162 +450,212 @@ export default function HomeScreen() {
   const renderContent = (tab) => {
     switch (tab) {
       case "Jornal":
-        return (
-          <View style={styles.tabContent}>
-            <Text style={[styles.contentTitle, { color: theme.colors.primary }]}>
-              Semana Tecnológica
-            </Text>
-            <View style={styles.journalImageContainer}>
-              <View style={[styles.journalImagePlaceholder, { backgroundColor: theme.colors.surfaceSecondary }]}>
-                <Ionicons name="newspaper" size={48} color={theme.colors.primary} />
-              </View>
-            </View>
-            <Text style={[styles.journalDescription, { color: theme.colors.text }]}>
-              O Jornal Etec é um periódico voltado para a divulgação de notícias, eventos e atividades da Etec. 
-              Seu objetivo é manter alunos, professores e a comunidade escolar atualizados sobre o que acontece 
-              dentro da instituição, além de abordar temas relevantes para o ambiente educacional.
-            </Text>
-          </View>
-        )
+        return <JournalTab theme={theme} scrollEnabled={scrollEnabled} />
 
       case "Horários":
-        return (
-          <View style={styles.tabContent}>
-            <Text style={[styles.contentTitle, { color: theme.colors.primary }]}>
-              Horários da Semana
-            </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scheduleScrollView}>
-              {["Segunda", "Terça", "Quarta", "Quinta", "Sexta"].map((day, dayIndex) => (
-                <View key={day} style={[styles.dayCard, { backgroundColor: theme.colors.surface }]}>
-                  <Text style={[styles.dayTitle, { color: theme.colors.primary }]}>{day}</Text>
-                  <ScrollView showsVerticalScrollIndicator={false}>
-                    {/* Morning Classes */}
-                    <View style={styles.classBlock}>
-                      <ClassItem
-                        time="08:00 - 08:50"
-                        subject="P.W. I, II, III"
-                        teacher="Prof. Paulo e William G."
-                        theme={theme}
-                      />
-                      <ClassItem
-                        time="08:50 - 09:40"
-                        subject="P.W. I, II, III"
-                        teacher="Prof. Paulo e William G."
-                        theme={theme}
-                      />
-                      <View style={[styles.breakItem, { backgroundColor: theme.colors.primary + "20" }]}>
-                        <Text style={[styles.breakText, { color: theme.colors.primary }]}>Intervalo (09:40 - 10:00)</Text>
-                      </View>
-                      <ClassItem
-                        time="10:00 - 10:50"
-                        subject="E.A.C.N.T."
-                        teacher="Prof. Elza e Prof. Andreia"
-                        theme={theme}
-                      />
-                      <ClassItem
-                        time="10:50 - 11:40"
-                        subject="E.A.C.N.T."
-                        teacher="Prof. Elza e Prof. Andreia"
-                        theme={theme}
-                      />
-                      <ClassItem
-                        time="11:40 - 12:30"
-                        subject="Matematica"
-                        teacher="Prof. Santos"
-                        theme={theme}
-                      />
-                      <View style={[styles.breakItem, { backgroundColor: theme.colors.primary + "20" }]}>
-                        <Text style={[styles.breakText, { color: theme.colors.primary }]}>Almoço (12:30 - 13:30)</Text>
-                      </View>
-                      <ClassItem
-                        time="13:30 - 14:20"
-                        subject="Inglês"
-                        teacher="Prof. Fidélis"
-                        theme={theme}
-                      />
-                      <ClassItem
-                        time="14:20 - 15:10"
-                        subject="Matematica"
-                        teacher="Prof. William B."
-                        theme={theme}
-                      />
-                      <ClassItem
-                        time="15:10 - 16:00"
-                        subject="Matematica"
-                        teacher="Prof. William B."
-                        theme={theme}
-                      />
-                    </View>
-                  </ScrollView>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
-        )
+        return <ScheduleTab theme={theme} scrollEnabled={scrollEnabled} />
 
       case "Patch":
         return (
-          <View style={styles.tabContent}>
-            <Text style={[styles.contentTitle, { color: theme.colors.primary }]}>Patch Notes</Text>
-            <View style={styles.patchNotesContainer}>
-              {[
-                {
-                  version: "1.2.0",
-                  date: "Abril 2025",
-                  notes: [
-                    "Novo layout para a aba de Eventos",
-                    "Animação adicionada nos ícones da Tab Bar",
-                    "Correções de bugs menores e melhorias de desempenho",
-                  ],
-                },
-                // ...outros patch notes...
-              ].map((patch, index) => (
-                <View key={index} style={[styles.patchNoteCard, { backgroundColor: theme.colors.primary + "20" }]}>
-                  <Text style={[styles.patchVersion, { color: theme.colors.text }]}>
-                    Versão {patch.version} - {patch.date}
+          <ScrollView style={styles.tabContent} scrollEnabled={scrollEnabled}>
+            <Text style={[styles.contentTitle, { color: theme.colors.primary }]}>
+              Patch Notes
+            </Text>
+
+            <View style={styles.patchContainer}>
+              {/* Feature Card */}
+              <View style={[styles.featureCard, { backgroundColor: theme.colors.surface }]}>
+                <View style={styles.featureHeader}>
+                  <Ionicons name="sparkles" size={32} color={theme.colors.primary} />
+                  <Text style={[styles.featureTitle, { color: theme.colors.text }]}>
+                    Novas funcionalidades!
                   </Text>
-                  {patch.notes.map((note, i) => (
-                    <Text key={i} style={[styles.patchItem, { color: theme.colors.textSecondary }]}>
-                      • {note}
-                    </Text>
-                  ))}
                 </View>
-              ))}
+                <View style={[styles.featureImageContainer, { backgroundColor: theme.colors.surfaceSecondary }]}>
+                  <Ionicons name="rocket-outline" size={64} color={theme.colors.primary} />
+                </View>
+                <Text style={[styles.featureDescription, { color: theme.colors.textSecondary }]}>
+                  Estamos sempre melhorando o EtecNotes para você!
+                </Text>
+              </View>
+
+              {/* Updates List */}
+              <View style={styles.updatesList}>
+                <Text style={[styles.updatesTitle, { color: theme.colors.text }]}>
+                  Atualizações Recentes
+                </Text>
+
+                <View style={[styles.versionCard, { backgroundColor: theme.colors.surface }]}>
+                  <View style={styles.versionHeader}>
+                    <Text style={[styles.versionNumber, { color: theme.colors.primary }]}>v1.2.0</Text>
+                    <Text style={[styles.versionDate, { color: theme.colors.textSecondary }]}>Outubro 2025</Text>
+                  </View>
+                  
+                  <View style={styles.updateItem}>
+                    <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
+                    <Text style={[styles.updateText, { color: theme.colors.text }]}>
+                      Novo estilo de personalização (Modo escuro)
+                    </Text>
+                  </View>
+                  
+                  <View style={styles.updateItem}>
+                    <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
+                    <Text style={[styles.updateText, { color: theme.colors.text }]}>
+                      Redesign das Interfaces anteriores
+                    </Text>
+                  </View>
+
+                  <View style={styles.updateItem}>
+                    <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
+                    <Text style={[styles.updateText, { color: theme.colors.text }]}>
+                      Melhorias de performance e navegação
+                    </Text>
+                  </View>
+
+                  <View style={styles.updateItem}>
+                    <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
+                    <Text style={[styles.updateText, { color: theme.colors.text }]}>
+                      Nova aba de horários integrada
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={[styles.versionCard, { backgroundColor: theme.colors.surface }]}>
+                  <View style={styles.versionHeader}>
+                    <Text style={[styles.versionNumber, { color: theme.colors.primary }]}>v1.1.0</Text>
+                    <Text style={[styles.versionDate, { color: theme.colors.textSecondary }]}>Setembro 2025</Text>
+                  </View>
+                  
+                  <View style={styles.updateItem}>
+                    <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
+                    <Text style={[styles.updateText, { color: theme.colors.text }]}>
+                      Sistema de autenticação implementado
+                    </Text>
+                  </View>
+                  
+                  <View style={styles.updateItem}>
+                    <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
+                    <Text style={[styles.updateText, { color: theme.colors.text }]}>
+                      Correção de bugs na tela de notas
+                    </Text>
+                  </View>
+                </View>
+              </View>
             </View>
-          </View>
+
+            {/* Espaçamento extra no final para garantir visibilidade */}
+            <View style={{ height: 120 }} />
+          </ScrollView>
         )
 
       case "Eventos":
         return (
-          <View style={styles.tabContent}>
-            <Text style={[styles.contentTitle, { color: theme.colors.primary }]}>Eventos</Text>
+          <ScrollView style={styles.tabContent} scrollEnabled={scrollEnabled}>
+            <Text style={[styles.contentTitle, { color: theme.colors.primary }]}>
+              Eventos
+            </Text>
+
             <View style={styles.eventsContainer}>
               {[
                 {
+                  id: 1,
                   title: "Semana Tecnológica",
-                  date: "10 a 14 de Abril de 2025",
-                  description: "Workshops, palestras e desafios para os alunos da Etec.",
+                  date: "15 de Setembro de 2025",
+                  time: "14:00",
+                  description: "Exposição de projetos tecnológicos desenvolvidos pelos alunos da Etec com demonstrações práticas.",
+                  location: "Auditório Principal",
                   icon: "school",
+                  isPaid: false,
                 },
-                // ...outros eventos...
-              ].map((event, index) => (
-                <View key={index} style={[styles.eventCard, { backgroundColor: theme.colors.surface }]}>
-                  <View style={styles.eventImageContainer}>
-                    <View style={[styles.eventImagePlaceholder, { backgroundColor: theme.colors.surfaceSecondary }]}>
+                {
+                  id: 2,
+                  title: "Hopi-Hari",
+                  date: "28 de Setembro de 2025",
+                  time: "19:00",
+                  description: "Passeio especial ao parque de diversões Hopi-Hari com toda a turma.",
+                  location: "Parque Hopi-Hari",
+                  icon: "happy",
+                  isPaid: true,
+                  price: 200,
+                },
+                {
+                  id: 3,
+                  title: "Festa Junina",
+                  date: "5 de Outubro de 2025",
+                  time: "13:30",
+                  description: "Grande festa junina com comidas típicas, jogos e apresentações culturais.",
+                  location: "Quadra Poliesportiva",
+                  icon: "bonfire",
+                  isPaid: true,
+                  price: 10,
+                },
+                {
+                  id: 4,
+                  title: "Hackathon Etec 2025",
+                  date: "19 de Outubro de 2025",
+                  time: "18:00",
+                  description: "Maratona de programação de 24 horas com premiação e oportunidades de estágio.",
+                  location: "Laboratórios de Informática",
+                  icon: "code-slash",
+                  isPaid: false,
+                },
+              ].map((event) => (
+                <View key={event.id} style={[styles.eventCardItem, { backgroundColor: theme.colors.surface }]}>
+                  <View style={styles.eventCardHeader}>
+                    <View style={[styles.eventIconContainer, { backgroundColor: theme.colors.surfaceSecondary }]}>
                       <Ionicons name={event.icon} size={32} color={theme.colors.primary} />
                     </View>
+                    <View style={styles.eventHeaderText}>
+                      <Text style={[styles.eventCardTitle, { color: theme.colors.text }]}>
+                        {event.title}
+                      </Text>
+                      {event.isPaid && (
+                        <View style={[styles.priceBadge, { backgroundColor: theme.colors.primary }]}>
+                          <Text style={styles.priceText}>R$ {event.price.toFixed(2)}</Text>
+                        </View>
+                      )}
+                    </View>
                   </View>
-                  <View style={styles.eventContent}>
-                    <Text style={[styles.eventTitle, { color: theme.colors.text }]}>{event.title}</Text>
-                    <Text style={[styles.eventDate, { color: theme.colors.primary }]}>{event.date}</Text>
-                    <Text style={[styles.eventDescription, { color: theme.colors.textSecondary }]}>
-                      {event.description}
+
+                  <Text style={[styles.eventCardDescription, { color: theme.colors.textSecondary }]}>
+                    {event.description}
+                  </Text>
+
+                  <View style={styles.eventDetailsContainer}>
+                    <View style={styles.eventDetailRow}>
+                      <Ionicons name="calendar" size={16} color={theme.colors.primary} />
+                      <Text style={[styles.eventDetailText, { color: theme.colors.text }]}>
+                        {event.date}
+                      </Text>
+                    </View>
+                    <View style={styles.eventDetailRow}>
+                      <Ionicons name="time" size={16} color={theme.colors.primary} />
+                      <Text style={[styles.eventDetailText, { color: theme.colors.text }]}>
+                        {event.time}
+                      </Text>
+                    </View>
+                    <View style={styles.eventDetailRow}>
+                      <Ionicons name="location" size={16} color={theme.colors.primary} />
+                      <Text style={[styles.eventDetailText, { color: theme.colors.text }]}>
+                        {event.location}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <TouchableOpacity 
+                    style={[styles.eventButton, { backgroundColor: theme.colors.primary }]}
+                  >
+                    <Text style={styles.eventButtonText}>
+                      {event.isPaid ? "Inscrever-se" : "Marcar Presença"}
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                 </View>
               ))}
             </View>
-          </View>
+
+            {/* Espaçamento extra no final para garantir visibilidade */}
+            <View style={{ height: 120 }} />
+          </ScrollView>
         )
     }
   }
@@ -430,26 +860,85 @@ const styles = StyleSheet.create({
     textAlign: 'center', // Centralizado
     paddingHorizontal: 24,
   },
-  scheduleScrollView: {
-    paddingHorizontal: 12,
+  scheduleNavigation: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    marginBottom: 16,
   },
-  dayCard: {
-    width: width - 80,
-    marginHorizontal: 8,
+  navButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  navButtonDisabled: {
+    opacity: 0.5,
+  },
+  dayIndicator: {
+    flex: 1,
+    marginHorizontal: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  dayIndicatorText: {
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  dayDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 20,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  scheduleContent: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  dayCardSingle: {
     borderRadius: 16,
     padding: 16,
-    height: 580,
+    marginBottom: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
   },
-  dayTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 16,
-    textAlign: "center",
+  vacantItem: {
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  vacantText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  vacantTime: {
+    fontSize: 12,
+    color: '#FFFFFF',
   },
   classBlock: {
     gap: 8,
@@ -484,5 +973,249 @@ const styles = StyleSheet.create({
   breakText: {
     fontSize: 12,
     fontWeight: "500",
+  },
+  patchContainer: {
+    marginTop: 16,
+  },
+  featureCard: {
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  featureHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  featureTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    marginLeft: 12,
+  },
+  featureImageContainer: {
+    height: 150,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  featureDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
+  },
+  updatesList: {
+    gap: 16,
+  },
+  updatesTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+  versionCard: {
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  versionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(128, 128, 128, 0.2)',
+  },
+  versionNumber: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  versionDate: {
+    fontSize: 12,
+    fontWeight: "500",
+  },
+  updateItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+    paddingLeft: 4,
+  },
+  updateText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+    marginLeft: 12,
+  },
+  eventCardItem: {
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  eventCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  eventIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  eventHeaderText: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+  },
+  eventCardTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    flex: 1,
+    marginRight: 8,
+  },
+  priceBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  priceText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  eventCardDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  eventDetailsContainer: {
+    marginBottom: 16,
+    gap: 8,
+  },
+  eventDetailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  eventDetailText: {
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  eventButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  eventButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  journalSliderCard: {
+    height: 280,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+    position: 'relative',
+  },
+  journalIconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  journalNavButton: {
+    position: 'absolute',
+    top: '50%',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  journalNavButtonLeft: {
+    left: 12,
+    transform: [{ translateY: -20 }],
+  },
+  journalNavButtonRight: {
+    right: 12,
+    transform: [{ translateY: -20 }],
+  },
+  journalIndicators: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 24,
+  },
+  journalIndicator: {
+    height: 8,
+    borderRadius: 4,
+  },
+  journalDescription: {
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  journalTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginBottom: 12,
+  },
+  journalText: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  journalInfoCard: {
+    borderRadius: 16,
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  journalInfoText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 22,
   },
 })

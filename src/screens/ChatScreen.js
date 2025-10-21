@@ -85,7 +85,7 @@ export default function ChatScreen() {
         ref={scrollViewRef}
         style={styles.messagesContainer}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.messagesContent}
+        contentContainerStyle={[styles.messagesContent, { paddingBottom: 180 }]}
       >
         {messages.map((message) => (
           <View
@@ -111,6 +111,9 @@ export default function ChatScreen() {
             </View>
           </View>
         ))}
+
+        {/* Espaçamento extra no final para garantir visibilidade */}
+        <View style={{ height: 120 }} />
       </ScrollView>
 
       {/* Input Area */}
@@ -225,9 +228,12 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   inputContainer: {
+    position: 'absolute',
+    bottom: 80,
+    left: 0,
+    right: 0,
     paddingHorizontal: 24,
     paddingVertical: 16,
-    paddingBottom: 32,
   },
   inputWrapper: {
     flexDirection: "row",
