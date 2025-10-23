@@ -8,6 +8,7 @@ import LoginScreen from "./src/screens/LoginScreen"
 import HomeScreen from "./src/screens/HomeScreen"
 import CalendarScreen from "./src/screens/CalendarScreen"
 import CloudScreen from "./src/screens/CloudScreen"
+import ChatScreen from "./src/screens/ChatScreen"
 import ProfileScreen from "./src/screens/ProfileScreen"
 import NotesScreen from "./src/screens/NotesScreen"
 import WellnessScreen from "./src/screens/WellnessScreen"
@@ -33,8 +34,9 @@ function TabNavigator() {
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: "Início" }} />
       <Tab.Screen name="Calendar" component={CalendarScreen} options={{ tabBarLabel: "Calendário" }} />
-      <Tab.Screen name="Chat" component={CloudScreen} options={{ tabBarLabel: "Chat" }} />
+      <Tab.Screen name="Chat" component={ChatScreen} options={{ tabBarLabel: "Chat" }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: "Perfil" }} />
+      <Tab.Screen name="Cloud" component={CloudScreen} options={{ tabBarLabel: "Cloud" }} />
       <Tab.Screen name="Notes" component={NotesScreen} options={{ tabBarLabel: "Notas" }} />
     </Tab.Navigator>
   )

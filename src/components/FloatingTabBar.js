@@ -46,9 +46,11 @@ export default function FloatingTabBar({ state, descriptors, navigation }) {
       case "Calendar":
         return focused ? "calendar" : "calendar-outline"
       case "Chat":
-        return focused ? "cloud" : "cloud-outline"
+        return focused ? "chatbubbles" : "chatbubbles-outline"
       case "Profile":
         return focused ? "person" : "person-outline"
+      case "Cloud":
+        return focused ? "cloud" : "cloud-outline"
       case "Notes":
         return focused ? "book" : "book-outline"
       default:
@@ -66,6 +68,8 @@ export default function FloatingTabBar({ state, descriptors, navigation }) {
         return "Chat"
       case "Profile":
         return "Perfil"
+      case "Cloud":
+        return "Cloud"
       case "Notes":
         return "Notas"
       default:

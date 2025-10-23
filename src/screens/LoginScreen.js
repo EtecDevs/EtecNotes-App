@@ -24,15 +24,20 @@ const roleConfigs = {
   aluno: {
     title: "Aluno",
     icon: "school", // ícone Ionicons para aluno
-    fields: ["login", "rm", "password"],
+    fields: ["login", "rm", "codigoEtec", "password"],
   },
   professor: {
     title: "Professor",
     icon: "person", // ícone Ionicons para professor
     fields: ["login", "password"],
   },
+  secretaria: {
+    title: "Secretaria",
+    icon: "briefcase", // ícone Ionicons para secretaria
+    fields: ["login", "password"],
+  },
   admin: {
-    title: "Administrador",
+    title: "Admin",
     icon: "shield", // ícone Ionicons para administrador
     fields: ["login", "password"],
   },
@@ -43,22 +48,80 @@ export default function LoginScreen() {
   const { login } = useAuth();
 
   const [selectedRole, setSelectedRole] = useState("aluno");
-  const [formData, setFormData] = useState({ login: "", rm: "", password: "" });
+  const [formData, setFormData] = useState({ login: "", rm: "", codigoEtec: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
   const translateX = useRef(new Animated.Value(0)).current;
+  
+  // Animações para o header dinâmico
+  const iconScale = useRef(new Animated.Value(1)).current;
+  const iconRotate = useRef(new Animated.Value(0)).current;
+  const titleOpacity = useRef(new Animated.Value(1)).current;
+  const titleTranslateY = useRef(new Animated.Value(0)).current;
 
   const handleRoleChange = (role) => {
     setSelectedRole(role);
-    setFormData({ login: "", rm: "", password: "" });
+    setFormData({ login: "", rm: "", codigoEtec: "", password: "" });
     setShowPassword(false);
+    
+    // Animar troca de ícone e título
+    Animated.parallel([
+      Animated.sequence([
+        Animated.timing(iconScale, {
+          toValue: 0.8,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.spring(iconScale, {
+          toValue: 1,
+          tension: 100,
+          friction: 3,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.timing(iconRotate, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.sequence([
+        Animated.timing(titleOpacity, {
+          toValue: 0,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(titleOpacity, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.sequence([
+        Animated.timing(titleTranslateY, {
+          toValue: -10,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(titleTranslateY, {
+          toValue: 0,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start(() => {
+      iconRotate.setValue(0);
+    });
   };
 
   const handleInputChange = (name, value) => {
     if (name === "rm") {
       // apenas números e máximo 5 dígitos
       const numericValue = value.replace(/\D/g, "").slice(0, 5);
+      setFormData((prev) => ({ ...prev, [name]: numericValue }));
+    } else if (name === "codigoEtec") {
+      // apenas números e máximo 3 dígitos
+      const numericValue = value.replace(/\D/g, "").slice(0, 3);
       setFormData((prev) => ({ ...prev, [name]: numericValue }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
@@ -89,7 +152,7 @@ export default function LoginScreen() {
   // calcula e anima o indicador quando seleciona role ou quando muda largura do container
   useEffect(() => {
     if (!containerWidth) return;
-    const slotWidth = containerWidth / 3;
+    const slotWidth = containerWidth / 4; // Agora são 4 roles
     Animated.spring(translateX, {
       toValue: slotWidth * Object.keys(roleConfigs).indexOf(selectedRole),
       useNativeDriver: true,
@@ -102,9 +165,51 @@ export default function LoginScreen() {
     <LinearGradient colors={["#8B5CF6", "#A855F7", "#C084FC"]} style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.keyboardView}>
         <View style={[styles.content, { paddingHorizontal: 20 }]}>
-          <View style={[styles.card, { backgroundColor: theme?.colors?.surface || "#FFFFFF" }]}>
-            <Text style={[styles.title, { color: theme?.colors?.primary || "#8B5CF6" }]}>Bem-vindo!</Text>
+          {/* Header Dinâmico com Animação */}
+          <View style={styles.headerContainer}>
+            {/* Ícone Animado que muda com o tipo de usuário */}
+            <Animated.View
+              style={[
+                styles.iconContainer,
+                {
+                  transform: [
+                    { scale: iconScale },
+                    {
+                      rotate: iconRotate.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['0deg', '360deg'],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              {/* Gradiente simulado com overlay */}
+              <View style={styles.iconGradient}>
+                <View style={styles.iconShine} />
+                <Ionicons
+                  name={roleConfigs[selectedRole].icon}
+                  size={32}
+                  color="#FFFFFF"
+                  style={styles.iconStyle}
+                />
+              </View>
+            </Animated.View>
 
+            {/* Mensagem Dinâmica com Animação */}
+            <Animated.View
+              style={{
+                opacity: titleOpacity,
+                transform: [{ translateY: titleTranslateY }],
+              }}
+            >
+              <Text style={styles.headerTitle}>
+                Entre como {roleConfigs[selectedRole].title}!
+              </Text>
+            </Animated.View>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: theme?.colors?.surface || "#FFFFFF" }]}>
             <View
               style={styles.roleRow}
               onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
@@ -115,7 +220,7 @@ export default function LoginScreen() {
                   style={[
                     styles.slider,
                     {
-                      width: containerWidth / 3 - 12, // retira margem horizontal (6+6)
+                      width: containerWidth / 4 - 6, // Ajustado: 4 roles; retira margem horizontal (2+2 = 4, mais 2 de ajuste)
                       transform: [{ translateX }],
                       backgroundColor: theme?.colors?.primary + "20",
                     },
@@ -135,14 +240,14 @@ export default function LoginScreen() {
                       { backgroundColor: "transparent", borderColor: theme?.colors?.border },
                     ]}
                   >
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
                       <Ionicons
                         name={roleConfigs[role].icon}
-                        size={14} // menor para evitar overflow
+                        size={16} // Aumentado de 14 para 16
                         color={active ? theme?.colors?.primary : theme?.colors?.text}
-                        style={{ marginRight: 6 }}
+                        style={{ marginRight: 4 }} // Reduzido de 6 para 4
                       />
-                      <Text style={{ color: active ? theme?.colors?.primary : theme?.colors?.text, fontWeight: "600", fontSize: 13 }}>
+                      <Text style={{ color: active ? theme?.colors?.primary : theme?.colors?.text, fontWeight: "600", fontSize: 12 }}>
                         {roleConfigs[role].title}
                       </Text>
                     </View>
@@ -156,7 +261,7 @@ export default function LoginScreen() {
               {roleConfigs[selectedRole].fields.includes("login") && (
                 <TextInput
                   style={[styles.input, { borderColor: theme?.colors?.border, backgroundColor: theme?.colors?.background, color: theme?.colors?.text }]}
-                  placeholder="Login"
+                  placeholder="Email"
                   placeholderTextColor={theme?.colors?.textSecondary}
                   value={formData.login}
                   onChangeText={(t) => handleInputChange("login", t)}
@@ -164,15 +269,31 @@ export default function LoginScreen() {
                 />
               )}
 
-              {roleConfigs[selectedRole].fields.includes("rm") && (
-                <TextInput
-                  style={[styles.input, { borderColor: theme?.colors?.border, backgroundColor: theme?.colors?.background, color: theme?.colors?.text }]}
-                  placeholder="RM (apenas números)"
-                  placeholderTextColor={theme?.colors?.textSecondary}
-                  value={formData.rm}
-                  onChangeText={(t) => handleInputChange("rm", t)}
-                  keyboardType="number-pad"
-                />
+              {/* Linha dividida: RM e Código da Etec */}
+              {(roleConfigs[selectedRole].fields.includes("rm") || roleConfigs[selectedRole].fields.includes("codigoEtec")) && (
+                <View style={styles.rowInputs}>
+                  {roleConfigs[selectedRole].fields.includes("rm") && (
+                    <TextInput
+                      style={[styles.halfInput, { borderColor: theme?.colors?.border, backgroundColor: theme?.colors?.background, color: theme?.colors?.text }]}
+                      placeholder="RM"
+                      placeholderTextColor={theme?.colors?.textSecondary}
+                      value={formData.rm}
+                      onChangeText={(t) => handleInputChange("rm", t)}
+                      keyboardType="number-pad"
+                    />
+                  )}
+
+                  {roleConfigs[selectedRole].fields.includes("codigoEtec") && (
+                    <TextInput
+                      style={[styles.halfInput, { borderColor: theme?.colors?.border, backgroundColor: theme?.colors?.background, color: theme?.colors?.text }]}
+                      placeholder="Código Etec"
+                      placeholderTextColor={theme?.colors?.textSecondary}
+                      value={formData.codigoEtec}
+                      onChangeText={(t) => handleInputChange("codigoEtec", t)}
+                      keyboardType="number-pad"
+                    />
+                  )}
+                </View>
               )}
 
               {roleConfigs[selectedRole].fields.includes("password") && (
@@ -218,11 +339,57 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  headerContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 24,
+    marginBottom: 12,
+    shadowColor: "#8B5CF6",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  iconGradient: {
+    width: 64,
+    height: 64,
+    borderRadius: 24,
+    backgroundColor: "#8B5CF6",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+    position: "relative",
+  },
+  iconShine: {
+    position: "absolute",
+    top: 0,
+    left: -64,
+    width: 64,
+    height: 64,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    transform: [{ skewX: "-20deg" }],
+  },
+  iconStyle: {
+    zIndex: 10,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    textAlign: "center",
+    textShadowColor: "rgba(0, 0, 0, 0.3)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
   card: {
     borderRadius: 20,
     padding: 28,
-    width: width * 0.92,
-    maxWidth: 520,
+    width: width * 0.98, // Aumentado de 0.95 para 0.98
+    maxWidth: 650, // Aumentado de 600 para 650
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.18,
@@ -240,20 +407,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 18,
     position: "relative",
-    paddingHorizontal: 6,
+    paddingHorizontal: 2, // Reduzido de 4 para 2
   },
   roleButton: {
     flex: 1,
     alignItems: "center",
-    paddingVertical: 8,
-    marginHorizontal: 6,
+    paddingVertical: 12, // Aumentado de 10 para 12
+    paddingHorizontal: 6, // Aumentado de 4 para 6
+    marginHorizontal: 2, // Reduzido de 3 para 2
     borderRadius: 12,
     borderWidth: 1,
     zIndex: 2, // ficar acima do slider
   },
   slider: {
     position: "absolute",
-    left: 6, // compensa marginHorizontal do primeiro botão
+    left: 2, // Ajustado de 4 para 2 (compensa marginHorizontal do primeiro botão)
     top: 0,
     bottom: 0,
     borderRadius: 12,
@@ -261,6 +429,20 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginBottom: 12,
+  },
+  rowInputs: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+    marginBottom: 12,
+  },
+  halfInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
   },
   input: {
     borderWidth: 1,
