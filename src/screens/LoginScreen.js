@@ -220,7 +220,7 @@ export default function LoginScreen() {
                   style={[
                     styles.slider,
                     {
-                      width: containerWidth / 4 - 6, // Ajustado: 4 roles; retira margem horizontal (2+2 = 4, mais 2 de ajuste)
+                      width: containerWidth / 4 - 8, // Ajustado: mais espaço para os botões
                       transform: [{ translateX }],
                       backgroundColor: theme?.colors?.primary + "20",
                     },
@@ -388,8 +388,8 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 20,
     padding: 28,
-    width: width * 0.98, // Aumentado de 0.95 para 0.98
-    maxWidth: 650, // Aumentado de 600 para 650
+    width: width * 0.95, // Reduzido para dar mais espaço
+    maxWidth: 600, // Reduzido para melhor proporção
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.18,
@@ -407,21 +407,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 18,
     position: "relative",
-    paddingHorizontal: 2, // Reduzido de 4 para 2
+    paddingHorizontal: 4, // Aumentado para dar mais espaço
   },
   roleButton: {
     flex: 1,
     alignItems: "center",
-    paddingVertical: 12, // Aumentado de 10 para 12
-    paddingHorizontal: 6, // Aumentado de 4 para 6
-    marginHorizontal: 2, // Reduzido de 3 para 2
+    paddingVertical: 12,
+    paddingHorizontal: 4, // Reduzido para evitar overflow
+    marginHorizontal: 1, // Reduzido para dar mais espaço aos campos
     borderRadius: 12,
     borderWidth: 1,
     zIndex: 2, // ficar acima do slider
   },
   slider: {
     position: "absolute",
-    left: 2, // Ajustado de 4 para 2 (compensa marginHorizontal do primeiro botão)
+    left: 4, // Ajustado para compensar o novo paddingHorizontal
     top: 0,
     bottom: 0,
     borderRadius: 12,
@@ -433,16 +433,17 @@ const styles = StyleSheet.create({
   rowInputs: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 12,
+    gap: 8, // Reduzido de 12 para 8
     marginBottom: 12,
   },
   halfInput: {
     flex: 1,
     borderWidth: 1,
     borderRadius: 12,
-    paddingHorizontal: 14,
+    paddingHorizontal: 12, // Reduzido de 14 para 12
     paddingVertical: 12,
-    fontSize: 16,
+    fontSize: 14, // Reduzido de 16 para 14
+    minWidth: 0, // Permite que o flex funcione corretamente
   },
   input: {
     borderWidth: 1,
