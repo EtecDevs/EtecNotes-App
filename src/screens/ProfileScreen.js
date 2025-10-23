@@ -1,5 +1,3 @@
-"use client"
-
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Switch } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import { Ionicons } from "@expo/vector-icons"

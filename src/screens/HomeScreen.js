@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useRef, useEffect } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated, Image } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
@@ -478,81 +476,76 @@ export default function HomeScreen() {
             <View style={styles.patchContainer}>
               {/* Feature Card */}
               <View style={[styles.featureCard, { backgroundColor: theme.colors.surface }]}>
-                <View style={styles.featureHeader}>
-                  <Ionicons name="sparkles" size={32} color={theme.colors.primary} />
-                  <Text style={[styles.featureTitle, { color: theme.colors.text }]}>
-                    Novas funcionalidades!
-                  </Text>
-                </View>
-                <View style={[styles.featureImageContainer, { backgroundColor: theme.colors.surfaceSecondary }]}>
-                  <Ionicons name="rocket-outline" size={64} color={theme.colors.primary} />
-                </View>
-                <Text style={[styles.featureDescription, { color: theme.colors.textSecondary }]}>
-                  Estamos sempre melhorando o EtecNotes para você!
-                </Text>
+          <View style={styles.patchNotesImageContainer}>
+            <Image 
+              source={require("../assets/imagesGeneral/PatchNotes.png")} 
+              style={styles.patchNotesImage}
+              resizeMode="contain"
+            />
+          </View>
               </View>
 
               {/* Updates List */}
               <View style={styles.updatesList}>
-                <Text style={[styles.updatesTitle, { color: theme.colors.text }]}>
-                  Atualizações Recentes
-                </Text>
+          <Text style={[styles.updatesTitle, { color: theme.colors.text }]}>
+            Atualizações Recentes
+          </Text>
 
-                <View style={[styles.versionCard, { backgroundColor: theme.colors.surface }]}>
-                  <View style={styles.versionHeader}>
-                    <Text style={[styles.versionNumber, { color: theme.colors.primary }]}>v1.2.0</Text>
-                    <Text style={[styles.versionDate, { color: theme.colors.textSecondary }]}>Outubro 2025</Text>
-                  </View>
-                  
-                  <View style={styles.updateItem}>
-                    <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
-                    <Text style={[styles.updateText, { color: theme.colors.text }]}>
-                      Novo estilo de personalização (Modo escuro)
-                    </Text>
-                  </View>
-                  
-                  <View style={styles.updateItem}>
-                    <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
-                    <Text style={[styles.updateText, { color: theme.colors.text }]}>
-                      Redesign das Interfaces anteriores
-                    </Text>
-                  </View>
+          <View style={[styles.versionCard, { backgroundColor: theme.colors.surface }]}>
+            <View style={styles.versionHeader}>
+              <Text style={[styles.versionNumber, { color: theme.colors.primary }]}>v1.2.0</Text>
+              <Text style={[styles.versionDate, { color: theme.colors.textSecondary }]}>Outubro 2025</Text>
+            </View>
+            
+            <View style={styles.updateItem}>
+              <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
+              <Text style={[styles.updateText, { color: theme.colors.text }]}>
+                Novo estilo de personalização (Modo escuro)
+              </Text>
+            </View>
+            
+            <View style={styles.updateItem}>
+              <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
+              <Text style={[styles.updateText, { color: theme.colors.text }]}>
+                Redesign das Interfaces anteriores
+              </Text>
+            </View>
 
-                  <View style={styles.updateItem}>
-                    <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
-                    <Text style={[styles.updateText, { color: theme.colors.text }]}>
-                      Melhorias de performance e navegação
-                    </Text>
-                  </View>
+            <View style={styles.updateItem}>
+              <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
+              <Text style={[styles.updateText, { color: theme.colors.text }]}>
+                Melhorias de performance e navegação
+              </Text>
+            </View>
 
-                  <View style={styles.updateItem}>
-                    <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
-                    <Text style={[styles.updateText, { color: theme.colors.text }]}>
-                      Nova aba de horários integrada
-                    </Text>
-                  </View>
-                </View>
+            <View style={styles.updateItem}>
+              <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
+              <Text style={[styles.updateText, { color: theme.colors.text }]}>
+                Nova aba de horários integrada
+              </Text>
+            </View>
+          </View>
 
-                <View style={[styles.versionCard, { backgroundColor: theme.colors.surface }]}>
-                  <View style={styles.versionHeader}>
-                    <Text style={[styles.versionNumber, { color: theme.colors.primary }]}>v1.1.0</Text>
-                    <Text style={[styles.versionDate, { color: theme.colors.textSecondary }]}>Setembro 2025</Text>
-                  </View>
-                  
-                  <View style={styles.updateItem}>
-                    <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
-                    <Text style={[styles.updateText, { color: theme.colors.text }]}>
-                      Sistema de autenticação implementado
-                    </Text>
-                  </View>
-                  
-                  <View style={styles.updateItem}>
-                    <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
-                    <Text style={[styles.updateText, { color: theme.colors.text }]}>
-                      Correção de bugs na tela de notas
-                    </Text>
-                  </View>
-                </View>
+          <View style={[styles.versionCard, { backgroundColor: theme.colors.surface }]}>
+            <View style={styles.versionHeader}>
+              <Text style={[styles.versionNumber, { color: theme.colors.primary }]}>v1.1.0</Text>
+              <Text style={[styles.versionDate, { color: theme.colors.textSecondary }]}>Setembro 2025</Text>
+            </View>
+            
+            <View style={styles.updateItem}>
+              <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
+              <Text style={[styles.updateText, { color: theme.colors.text }]}>
+                Sistema de autenticação implementado
+              </Text>
+            </View>
+            
+            <View style={styles.updateItem}>
+              <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />
+              <Text style={[styles.updateText, { color: theme.colors.text }]}>
+                Correção de bugs na tela de notas
+              </Text>
+            </View>
+          </View>
               </View>
             </View>
 
@@ -1244,5 +1237,15 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     lineHeight: 22,
+  },
+  patchNotesImageContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+  },
+  patchNotesImage: {
+    width: '80%',
+    maxWidth: 300,
+    height: 200,
   },
 })

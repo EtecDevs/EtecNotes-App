@@ -1,4 +1,3 @@
-"use client"
 import { NavigationContainer } from "@react-navigation/native"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { createStackNavigator } from "@react-navigation/stack"
@@ -37,7 +36,6 @@ function TabNavigator() {
       <Tab.Screen name="Chat" component={CloudScreen} options={{ tabBarLabel: "Chat" }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: "Perfil" }} />
       <Tab.Screen name="Notes" component={NotesScreen} options={{ tabBarLabel: "Notas" }} />
-      <Tab.Screen name="Wellness" component={WellnessScreen} options={{ tabBarLabel: "Bem-estar" }} />
     </Tab.Navigator>
   )
 }

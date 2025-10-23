@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useRef, useEffect } from "react"
 import {
   View,
@@ -17,12 +15,11 @@ import {
 import { Ionicons } from "@expo/vector-icons"
 import { useTheme } from "../context/ThemeContext"
 import { GEMINI_API_KEY, GEMINI_API_URL, SYSTEM_PROMPT } from "../config/gemini"
-import { useNavigation } from "@react-navigation/native"
+import WellnessScreen from "./WellnessScreen"
 
 const { width } = Dimensions.get("window")
 
 export default function CloudScreen() {
-  const navigation = useNavigation()
   const [activeTab, setActiveTab] = useState("iatec")
   const [messages, setMessages] = useState([
     {
@@ -37,13 +34,9 @@ export default function CloudScreen() {
   const scrollViewRef = useRef()
   const { theme } = useTheme()
 
-  // Função para navegar para Wellness quando clicar em Meditação
+  // Função para alternar entre tabs
   const handleTabChange = (tab) => {
-    if (tab === "meditation") {
-      navigation.navigate("Wellness")
-    } else {
-      setActiveTab(tab)
-    }
+    setActiveTab(tab)
   }
 
   // Função auxiliar para delay (para retry)
@@ -241,6 +234,11 @@ export default function CloudScreen() {
   useEffect(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true })
   }, [messages])
+
+  // Se a tab ativa for meditação, mostrar WellnessScreen
+  if (activeTab === "meditation") {
+    return <WellnessScreen isEmbedded={true} onTabChange={handleTabChange} />
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>

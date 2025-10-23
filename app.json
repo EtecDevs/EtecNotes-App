@@ -1,8 +1,35 @@
 {
-  "plugins": [
-    "expo-font"
-  ],
-  "android": {
-    "package": "com.anonymous.myv0project"
+  "expo": {
+    "name": "EtecNotes",
+    "slug": "etecnotes-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.etecdevs.etecnotes"
+    },
+    "android": {
+      "package": "com.etecdevs.etecnotes",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

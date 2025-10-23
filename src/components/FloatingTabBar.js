@@ -1,5 +1,3 @@
-"use client"
-
 import { useRef, useEffect } from "react"
 import { View, TouchableOpacity, Animated, StyleSheet } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
@@ -48,13 +46,11 @@ export default function FloatingTabBar({ state, descriptors, navigation }) {
       case "Calendar":
         return focused ? "calendar" : "calendar-outline"
       case "Chat":
-        return focused ? "chatbubble" : "chatbubble-outline"
+        return focused ? "cloud" : "cloud-outline"
       case "Profile":
         return focused ? "person" : "person-outline"
       case "Notes":
         return focused ? "book" : "book-outline"
-      case "Wellness":
-        return focused ? "fitness" : "fitness-outline"
       default:
         return "circle"
     }
@@ -72,8 +68,6 @@ export default function FloatingTabBar({ state, descriptors, navigation }) {
         return "Perfil"
       case "Notes":
         return "Notas"
-      case "Wellness":
-        return "Bem-estar"
       default:
         return routeName
     }
